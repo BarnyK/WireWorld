@@ -59,7 +59,6 @@ class MainWindow(QMainWindow):
     def next_frame(self):
         print("Next frame clicked")
         self.game_holder.next_frame()
-        self.game_holder.update_board()
 
     def play(self):
         print("Play button clicked")

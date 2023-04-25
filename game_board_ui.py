@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, qRgb
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout, QSpinBox
 
@@ -91,20 +91,28 @@ class GameBoardUI(QWidget):
 
     def next_frame(self):
         self.game.next()
+        self.update_board()
 
-    def play(self, time):
+    def play(self, time_delimeter):
         if self.state == "playing":
             self._pause()
-        if self.state == "paused":
-            self._play()
+        elif self.state == "paused":
+            self._play(time_delimeter)
 
-    def _play(self):
-        self.state = "paused"
-        pass
+    def _play(self, time_delimeter: int):
+        print("Play")
+        self.state = "playing"
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.next_frame)
+        self.timer.start(time_delimeter)
+
 
     def _pause(self):
-        self.state = "playing"
-        pass
+        print("Pause")
+        self.state = "paused"
+        self.timer.stop()
+
+
 
     def image_press_event(self, event):
         print("MousePressEvent")
