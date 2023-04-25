@@ -40,7 +40,6 @@ class GameBoardUI(QWidget):
         self.width = 30
         self.height = 40
 
-
         self.color_table = [qRgb(*t) for t in self.game.color_table()]
 
         self.image_display = QLabel()
@@ -106,19 +105,16 @@ class GameBoardUI(QWidget):
         self.timer.timeout.connect(self.next_frame)
         self.timer.start(time_delimeter)
 
-
     def _pause(self):
         print("Pause")
         self.state = "paused"
         self.timer.stop()
 
-
-
     def image_press_event(self, event):
         print("MousePressEvent")
 
-        x = event.pos().x()  # - width_offset
-        y = event.pos().y()  # - height_offset
+        x = event.pos().x()
+        y = event.pos().y()
 
         size = self.image_display.size()
         pixels_per_point_w = size.width() / self.width

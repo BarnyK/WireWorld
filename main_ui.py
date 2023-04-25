@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, QSpinBox
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel
 
 import game
 from game_board_ui import GameBoardUI
@@ -6,7 +6,7 @@ from game_board_ui import GameBoardUI
 
 def make_speed_selector():
     speed_selector = QDoubleSpinBox()
-    speed_selector.setRange(0,50)
+    speed_selector.setRange(0, 50)
     speed_selector.setSingleStep(0.1)
     label = QLabel("Frames Per Second")
     layout = QHBoxLayout()
@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         time_delimeter = self.fps * 1000
         self.game_holder.play(time_delimeter)
 
-    def fps_change(self,v: float):
+    def fps_change(self, v: float):
         self.fps = v
         print(f"fps changed to {v}")
 
@@ -74,12 +74,3 @@ class MainWindow(QMainWindow):
 
     def save_file(self):
         pass
-
-
-
-
-
-
-
-
-
