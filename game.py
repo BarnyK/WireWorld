@@ -44,12 +44,12 @@ class Game:
         """
         pass
 
-    def expand_board(self, x1: int, y1: int, x2: int, y2: int) -> None:
+    def expand_board(self, x1: int, x2: int, y1: int, y2: int) -> None:
         """
             expand_board expands the board in 4 direction
         :param x1: expansion to the left
-        :param y1: expansion to the top
         :param x2: expansion to the right
+        :param y1: expansion to the top
         :param y2: expansion to the bottom
         """
         pass
@@ -114,13 +114,13 @@ class WireWorld(Game):
         # conductor -> head if on or two neighbours are electrons, else -> conductor
         conductors = np.where(self.board == CONDUCTOR)
         for i in range(len(conductors[0])):
-            x, y = conductors[0][i], conductors[1][i]
+            y, x = conductors[0][i], conductors[1][i]
             # iteration over all conductors
             neighbours = neighbourhood.moore_hard(self.board, x, y)
             if np.count_nonzero(neighbours == ELECTRON_HEAD) in [1, 2]:
-                new_board[x, y] = ELECTRON_HEAD
+                new_board[y, x] = ELECTRON_HEAD
             else:
-                new_board[x, y] = CONDUCTOR
+                new_board[y, x] = CONDUCTOR
         # head -> tail
         new_board[self.board == ELECTRON_HEAD] = ELECTRON_TAIL
         # tail -> conductor
@@ -141,21 +141,21 @@ class WireWorld(Game):
             width = self.board.shape[1]
         if height == -1:
             height = self.board.shape[0]
-        board = self.board[x:x + height, y:y + width]
+        board = self.board[y:y + height, x:x + width]
         if pad:
             h, w = board.shape
             board = np.pad(board, ((0, max(0, height - h)), (0, width - w)))
         return board
 
-    def expand_board(self, x1: int, y1: int, x2: int, y2: int) -> None:
+    def expand_board(self, x1: int, x2: int, y1: int, y2: int) -> None:
         """
             expand_board expands the board in 4 direction
         :param x1: expansion to the left
-        :param y1: expansion to the top
         :param x2: expansion to the right
+        :param y1: expansion to the top
         :param y2: expansion to the bottom
         """
-        raise NotImplementedError
+        self.board = np.pad(self.board, ((y1, y2), (x1, x2)))
 
     @staticmethod
     def get_color_dict() -> dict:
@@ -180,8 +180,8 @@ class WireWorld(Game):
         ]
 
     def get_board_size(self) -> tuple:
-        return self.board.shape
-
+        height, width = self.board.shape
+        return width, height
 
 
 if __name__ == "__main__":

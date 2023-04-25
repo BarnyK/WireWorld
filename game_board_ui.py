@@ -1,11 +1,11 @@
-import numpy as np
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout
-from PyQt5.QtGui import QImage, QPixmap, qRgb
-from game import Game
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QImage, QPixmap, qRgb
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout, QSpinBox
+
+from game import Game
 
 
-def create_tool_selector(game: Game):
+def make_tool_selector(game: Game):
     possible_values = game.possible_values()
     tool_selector = QComboBox()
     for name, value in possible_values:
@@ -18,16 +18,28 @@ def create_tool_selector(game: Game):
     return tool_selector, layout
 
 
+def make_labeled_spinbox(label_name, slot, min_value, max_value, initial_value):
+    label = QLabel(label_name)
+    spin = QSpinBox()
+    spin.setRange(min_value, max_value)
+    spin.setValue(initial_value)
+    layout = QHBoxLayout()
+    layout.addWidget(label)
+    layout.addWidget(spin)
+    spin.valueChanged.connect(slot)
+    return spin, layout
+
+
 class GameBoardUI(QWidget):
     def __init__(self, game: Game):
         super().__init__()
         self.game = game
         self.xpos = 0
         self.ypos = 0
-        self.width = 10
-        self.height = 20
-        # Ensure board dimensions here
-        self.tool = 0
+        self.width = 30
+        self.height = 40
+        self.ensure_game_size()
+
         self.color_table = [qRgb(*t) for t in self.game.color_table()]
 
         self.image_display = QLabel()
@@ -37,7 +49,21 @@ class GameBoardUI(QWidget):
         self.image_display.mousePressEvent = self.image_press_event
 
         # EDIT UI
-        self.tool_selector, tool_layout = create_tool_selector(self.game)
+        self.tool_selector, tool_layout = make_tool_selector(self.game)
+
+        # Position and size control
+        xpos_spinbox, xpos_spinbox_layout = make_labeled_spinbox("XPOS", self.move_board_x, 0,
+                                                                 self.board_width() - self.width, self.xpos)
+        ypos_spinbox, ypos_spinbox_layout = make_labeled_spinbox("YPOS", self.move_board_y, 0,
+                                                                 self.board_height() - self.height, self.ypos)
+        width_spinbox, width_spinbox_layout = make_labeled_spinbox("Width", self.change_view_width, 15, 2000,
+                                                                   self.width)
+        height_spinbox, height_spinbox_layout = make_labeled_spinbox("Height", self.change_view_height, 20, 2000,
+                                                                     self.height)
+
+        pas_layout = QHBoxLayout()
+        for spin in [xpos_spinbox_layout, ypos_spinbox_layout, width_spinbox_layout, height_spinbox_layout]:
+            pas_layout.addLayout(spin)
 
         edit_layout = QHBoxLayout()
         edit_layout.addLayout(tool_layout)
@@ -45,6 +71,7 @@ class GameBoardUI(QWidget):
         # tool selector, expand, move
 
         self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(pas_layout)
         self.main_layout.addWidget(self.image_display)
         self.main_layout.addLayout(edit_layout)
         self.setLayout(self.main_layout)
@@ -52,6 +79,7 @@ class GameBoardUI(QWidget):
         self.update_board()
 
     def update_board(self):
+        print("update_board")
         board = self.game.get_board(self.xpos, self.ypos, self.width, self.height, pad=True)
 
         image = QImage(board.data, board.shape[1], board.shape[0], board.strides[0], QImage.Format_Indexed8)
@@ -65,17 +93,8 @@ class GameBoardUI(QWidget):
     def image_press_event(self, event):
         print("MousePressEvent")
 
-        label_size = self.image_display.size()
-        pixmap_size = self.image_display.pixmap().size()
-        # print(label_size, pixmap_size)
-        # width_offset = (label_size.width() - pixmap_size.width()) / 2
-        # height_offset = (label_size.width() - pixmap_size.width()) / 2
-
-        # print(width_offset, height_offset)
-        # print(width_offset, height_offset)
-        x = event.pos().x() #- width_offset
-        y = event.pos().y() #- height_offset
-        print(event.pos().x(), x)
+        x = event.pos().x()  # - width_offset
+        y = event.pos().y()  # - height_offset
 
         size = self.image_display.size()
         pixels_per_point_w = size.width() / self.width
@@ -83,13 +102,6 @@ class GameBoardUI(QWidget):
 
         board_x = int(x // pixels_per_point_w + self.xpos)
         board_y = int(y // pixels_per_point_h + self.ypos)
-
-        # print(x,y)
-        # print(board_x,board_y)
-        # print(f"{x / pixels_per_point_w}, {y / pixels_per_point_h}")
-
-        # board_x = int(x * self.width / self.image_display.pixmap().width())
-        # board_y = int(x * self.height / self.image_display.pixmap().height())
 
         if event.button() == Qt.RightButton:
             tool_value = 0
@@ -100,15 +112,39 @@ class GameBoardUI(QWidget):
         self.update_board()
 
     def ensure_game_size(self):
-        h, w = self.game.get_board_size()
-        extend_h = max(self.height - h, 0)
-        extend_w = max(self.width - w, 0)
-        if extend_w >0 or extend_h > 0:
-            self.game.expand_board(0,0,extend_h,extend_w)
+        w, h = self.game.get_board_size()
+        extend_h = max(self.height - h + self.ypos, 0)
+        extend_w = max(self.width - w + self.xpos, 0)
+        if extend_w > 0 or extend_h > 0:
+            self.game.expand_board(0, extend_w, 0, extend_h)
 
-    def move_board(self, xdiff, ydiff):
-        pass
+    def change_view_width(self, value):
+        self.width = value
+        self.ensure_game_size()
+        self.update_board()
 
+    def change_view_height(self, value):
+        self.height = value
+        self.ensure_game_size()
+        self.update_board()
 
+    def move_board_x(self, value):
+        width = self.board_width()
+        self.xpos = min(value, width - self.width)
+        self.update_board()
 
+    def move_board_y(self, value):
+        height = self.board_height()
+        self.ypos = min(value, height - self.height)
+        self.update_board()
 
+    def board_width(self) -> int:
+        width, _ = self.game.get_board_size()
+        return width
+
+    def board_height(self) -> int:
+        _, height = self.game.get_board_size()
+        return height
+
+    def resizeEvent(self, a0) -> None:
+        self.update_board()

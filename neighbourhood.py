@@ -8,14 +8,14 @@ def moore_pad(arr: np.ndarray, x: int, y: int):
 
 
 def moore_hard(arr: np.ndarray, x: int, y: int):
-    mx, my = arr.shape
-    neighbours = [(x + i, y + j) for i in range(-1, 2, 1) for j in range(-1, 2, 1)]
-    neighbours = [(x, y) for x, y in neighbours if x >= 0 and y >= 0]
-    neighbours = [(x, y) for x, y in neighbours if x < mx and y < my]
-    neighbours.remove((x, y))
-    x_coords, y_coords = zip(*neighbours)
+    my, mx = arr.shape
+    neighbours = [(y + i, x + j) for i in range(-1, 2, 1) for j in range(-1, 2, 1)]
+    neighbours = [(y, x) for y, x in neighbours if x >= 0 and y >= 0]
+    neighbours = [(y, x) for y, x in neighbours if x < mx and y < my]
+    neighbours.remove((y, x))
+    y_coords, x_coords = zip(*neighbours)
 
-    return arr[x_coords, y_coords]
+    return arr[y_coords, x_coords]
 
 
 if __name__ == "__main__":
@@ -24,6 +24,6 @@ if __name__ == "__main__":
     test_matrix[1, 1] = 3
     test_matrix[2, 2] = 5
     test_matrix[3, 3] = 7
-
-    a = moore_hard(test_matrix, 3, 3)
-    print((a == 0).sum())
+    print(test_matrix)
+    a = moore_hard(test_matrix, 3, 1)
+    print(a)
