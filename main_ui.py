@@ -60,14 +60,11 @@ class MainWindow(QMainWindow):
         print("Next frame clicked")
         self.game_holder.next_frame()
         self.game_holder.update_board()
-        pass
 
     def play(self):
         print("Play button clicked")
-        if self.playing:
-            pass
-        else:
-            pass
+        time_delimeter = self.fps * 1000
+        self.game_holder.play(time_delimeter)
 
     def fps_change(self,v: float):
         self.fps = v

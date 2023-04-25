@@ -33,12 +33,13 @@ def make_labeled_spinbox(label_name, slot, min_value, max_value, initial_value):
 class GameBoardUI(QWidget):
     def __init__(self, game: Game):
         super().__init__()
+        self.state = "paused"
         self.game = game
         self.xpos = 0
         self.ypos = 0
         self.width = 30
         self.height = 40
-        self.ensure_game_size()
+
 
         self.color_table = [qRgb(*t) for t in self.game.color_table()]
 
@@ -52,14 +53,14 @@ class GameBoardUI(QWidget):
         self.tool_selector, tool_layout = make_tool_selector(self.game)
 
         # Position and size control
-        xpos_spinbox, xpos_spinbox_layout = make_labeled_spinbox("XPOS", self.move_board_x, 0,
-                                                                 self.board_width() - self.width, self.xpos)
-        ypos_spinbox, ypos_spinbox_layout = make_labeled_spinbox("YPOS", self.move_board_y, 0,
-                                                                 self.board_height() - self.height, self.ypos)
-        width_spinbox, width_spinbox_layout = make_labeled_spinbox("Width", self.change_view_width, 15, 2000,
-                                                                   self.width)
-        height_spinbox, height_spinbox_layout = make_labeled_spinbox("Height", self.change_view_height, 20, 2000,
-                                                                     self.height)
+        self.xpos_spinbox, xpos_spinbox_layout = make_labeled_spinbox("XPOS", self.move_board_x, 0,
+                                                                      self.board_width() - self.width, self.xpos)
+        self.ypos_spinbox, ypos_spinbox_layout = make_labeled_spinbox("YPOS", self.move_board_y, 0,
+                                                                      self.board_height() - self.height, self.ypos)
+        self.width_spinbox, width_spinbox_layout = make_labeled_spinbox("Width", self.change_view_width, 15, 2000,
+                                                                        self.width)
+        self.height_spinbox, height_spinbox_layout = make_labeled_spinbox("Height", self.change_view_height, 20, 2000,
+                                                                          self.height)
 
         pas_layout = QHBoxLayout()
         for spin in [xpos_spinbox_layout, ypos_spinbox_layout, width_spinbox_layout, height_spinbox_layout]:
@@ -76,6 +77,7 @@ class GameBoardUI(QWidget):
         self.main_layout.addLayout(edit_layout)
         self.setLayout(self.main_layout)
 
+        self.ensure_game_size()
         self.update_board()
 
     def update_board(self):
@@ -89,6 +91,20 @@ class GameBoardUI(QWidget):
 
     def next_frame(self):
         self.game.next()
+
+    def play(self, time):
+        if self.state == "playing":
+            self._pause()
+        if self.state == "paused":
+            self._play()
+
+    def _play(self):
+        self.state = "paused"
+        pass
+
+    def _pause(self):
+        self.state = "playing"
+        pass
 
     def image_press_event(self, event):
         print("MousePressEvent")
@@ -117,15 +133,18 @@ class GameBoardUI(QWidget):
         extend_w = max(self.width - w + self.xpos, 0)
         if extend_w > 0 or extend_h > 0:
             self.game.expand_board(0, extend_w, 0, extend_h)
+            self.update_position_spinbox_ranges()
 
     def change_view_width(self, value):
         self.width = value
         self.ensure_game_size()
+        self.update_position_spinbox_ranges()
         self.update_board()
 
     def change_view_height(self, value):
         self.height = value
         self.ensure_game_size()
+        self.update_position_spinbox_ranges()
         self.update_board()
 
     def move_board_x(self, value):
@@ -148,3 +167,7 @@ class GameBoardUI(QWidget):
 
     def resizeEvent(self, a0) -> None:
         self.update_board()
+
+    def update_position_spinbox_ranges(self):
+        self.xpos_spinbox.setRange(0, self.board_width() - self.width)
+        self.ypos_spinbox.setRange(0, self.board_height() - self.height)
