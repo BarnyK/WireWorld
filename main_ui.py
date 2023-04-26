@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, \
+    QFileDialog, QDialog
 
 import game
 from game_board_ui import GameBoardUI
@@ -48,7 +49,11 @@ class MainWindow(QMainWindow):
         control_layout.addWidget(self.play_button)
         control_layout.addWidget(self.next_frame_button)
 
+        # File buttons
+        file_buttons_layout = self.make_save_load_buttons()
+
         self.main_layout = QVBoxLayout()
+        self.main_layout.addLayout(file_buttons_layout)
         # GAME UI
         self.main_layout.addWidget(self.game_holder)
         # EDIT UI
@@ -62,20 +67,40 @@ class MainWindow(QMainWindow):
 
     def play(self):
         print("Play button clicked")
-        time_delimeter = int(1/self.fps * 1000)
-        self.game_holder.play(time_delimeter)
+        time_delimiter = int(1 / self.fps * 1000)
+        self.game_holder.play(time_delimiter)
 
         if self.game_holder.state == "paused":
             self.play_button.setText("Play")
         elif self.game_holder.state == "playing":
             self.play_button.setText("Pause")
 
+    def make_save_load_buttons(self):
+        save = QPushButton("Save")
+        save.clicked.connect(self.save_file)
+
+        load = QPushButton("Load")
+        load.clicked.connect(self.load_file)
+
+        layout = QHBoxLayout()
+        layout.addWidget(save)
+        layout.addWidget(load)
+        return layout
+
     def fps_change(self, v: float):
         self.fps = v
         print(f"fps changed to {v}")
 
     def load_file(self):
-        pass
+        dialog = QDialog()
+        dialog.setModal(True)
+        filename, _ = QFileDialog.getOpenFileName(dialog, 'Load file', '', 'Numpy File(*.npy)')
+        if filename:
+            self.game_holder.load_game_file(filename)
 
     def save_file(self):
-        pass
+        dialog = QDialog()
+        dialog.setModal(True)
+        filename, _ = QFileDialog.getSaveFileName(dialog, 'Save file', '', 'Numpy File(*.npy)')
+        if filename:
+            self.game_holder.save_game_file(filename)

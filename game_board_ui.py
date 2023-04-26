@@ -92,11 +92,11 @@ class GameBoardUI(QWidget):
         self.game.next()
         self.update_board()
 
-    def play(self, time_delimeter: int):
+    def play(self, time_delimiter: int):
         if self.state == "playing":
             self._pause()
         elif self.state == "paused":
-            self._play(time_delimeter)
+            self._play(time_delimiter)
 
     def _play(self, time_delimeter: int):
         print("Play")
@@ -175,3 +175,13 @@ class GameBoardUI(QWidget):
     def update_position_spinbox_ranges(self):
         self.xpos_spinbox.setRange(0, self.board_width() - self.width)
         self.ypos_spinbox.setRange(0, self.board_height() - self.height)
+
+    def load_game_file(self, filepath: str):
+        self.game.load_board(filepath)
+        self.xpos = 0
+        self.ypos = 0
+        self.ensure_game_size()
+        self.update_board()
+
+    def save_game_file(self, filepath: str):
+        self.game.save_board(filepath)

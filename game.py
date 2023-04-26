@@ -69,6 +69,12 @@ class Game:
     def get_board_size(self) -> tuple:
         pass
 
+    def load_board(self, filename: str):
+        pass
+
+    def save_board(self, filename: str):
+        pass
+
 
 DEFAULT_BOARD_SIZE = (100, 100)
 EMPTY = 0
@@ -182,6 +188,13 @@ class WireWorld(Game):
     def get_board_size(self) -> tuple:
         height, width = self.board.shape
         return width, height
+
+    def load_board(self, filename: str):
+        board = np.load(filename)
+        self.board = board
+
+    def save_board(self, filename: str):
+        np.save(filename, self.board)
 
 
 if __name__ == "__main__":
