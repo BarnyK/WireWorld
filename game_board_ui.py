@@ -92,7 +92,7 @@ class GameBoardUI(QWidget):
         self.game.next()
         self.update_board()
 
-    def play(self, time_delimeter):
+    def play(self, time_delimeter: int):
         if self.state == "playing":
             self._pause()
         elif self.state == "paused":

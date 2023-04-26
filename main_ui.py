@@ -24,8 +24,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.main_widget)
 
         # Control UI elements
-        self.play_button = QPushButton("Start")
-        self.next_frame_button = QPushButton("Next")
+        self.play_button = QPushButton("Play")
+        self.next_frame_button = QPushButton("Next Frame")
         self.speed_selector, self.speed_selector_layout = make_speed_selector()
 
         # Game board
@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 
         self.next_frame_button.clicked.connect(self.next_frame)
 
-        self.fps = 1
+        self.fps = 15
         self.speed_selector.setValue(self.fps)
         self.speed_selector.valueChanged.connect(self.fps_change)
 
@@ -62,8 +62,13 @@ class MainWindow(QMainWindow):
 
     def play(self):
         print("Play button clicked")
-        time_delimeter = self.fps * 1000
+        time_delimeter = int(1/self.fps * 1000)
         self.game_holder.play(time_delimeter)
+
+        if self.game_holder.state == "paused":
+            self.play_button.setText("Play")
+        elif self.game_holder.state == "playing":
+            self.play_button.setText("Pause")
 
     def fps_change(self, v: float):
         self.fps = v
