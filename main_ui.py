@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QPushButton, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, \
-    QFileDialog, QDialog
+    QFileDialog, QDialog, QStyleFactory
 
 import game
 from game_board_ui import GameBoardUI
@@ -7,7 +7,7 @@ from game_board_ui import GameBoardUI
 
 def make_speed_selector():
     speed_selector = QDoubleSpinBox()
-    speed_selector.setRange(0, 50)
+    speed_selector.setRange(0, 100)
     speed_selector.setSingleStep(0.1)
     label = QLabel("Frames Per Second")
     layout = QHBoxLayout()

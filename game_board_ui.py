@@ -20,13 +20,21 @@ def make_tool_selector(game: Game):
 
 def make_labeled_spinbox(label_name, slot, min_value, max_value, initial_value):
     label = QLabel(label_name)
+    label.setAlignment(Qt.AlignCenter)
+
     spin = QSpinBox()
     spin.setRange(min_value, max_value)
     spin.setValue(initial_value)
-    layout = QHBoxLayout()
+
+    layout = QVBoxLayout()
     layout.addWidget(label)
     layout.addWidget(spin)
     spin.valueChanged.connect(slot)
+
+    spin.setFixedWidth(75)
+    label.setFixedWidth(75)
+    layout.setAlignment(Qt.AlignCenter)
+    layout.setContentsMargins(5, 5, 5, 5)
     return spin, layout
 
 
@@ -45,7 +53,7 @@ class GameBoardUI(QWidget):
         self.image_display = QLabel()
         self.image_display.setAlignment(Qt.AlignCenter)
         self.image_display.setScaledContents(True)
-        self.image_display.setMinimumSize(640, 400)
+        self.image_display.setMinimumSize(600, 400)
         self.image_display.mousePressEvent = self.image_press_event
 
         # EDIT UI
@@ -56,24 +64,44 @@ class GameBoardUI(QWidget):
                                                                       self.board_width() - self.width, self.xpos)
         self.ypos_spinbox, ypos_spinbox_layout = make_labeled_spinbox("YPOS", self.move_board_y, 0,
                                                                       self.board_height() - self.height, self.ypos)
-        self.width_spinbox, width_spinbox_layout = make_labeled_spinbox("Width", self.change_view_width, 15, 2000,
+
+        # self.board_width_spinbox, board_width_spinbox_layout = make_labeled_spinbox("Board Width", self.move_board_y, 0,
+        #                                                               self.board_height() - self.height, self.ypos)
+
+        self.width_spinbox, width_spinbox_layout = make_labeled_spinbox("View Width", self.change_view_width, 15, 2000,
                                                                         self.width)
-        self.height_spinbox, height_spinbox_layout = make_labeled_spinbox("Height", self.change_view_height, 20, 2000,
+        self.height_spinbox, height_spinbox_layout = make_labeled_spinbox("View Height", self.change_view_height, 20,
+                                                                          2000,
                                                                           self.height)
 
+        # Setup of position and size control widget
+        pas = QWidget()
         pas_layout = QHBoxLayout()
-        for spin in [xpos_spinbox_layout, ypos_spinbox_layout, width_spinbox_layout, height_spinbox_layout]:
+
+        for spin in [xpos_spinbox_layout, ypos_spinbox_layout]:
             pas_layout.addLayout(spin)
 
+        pas_layout.addStretch()
+        for spin in [width_spinbox_layout, height_spinbox_layout]:
+            pas_layout.addLayout(spin)
+
+        pas.setFixedWidth(600)
+        pas_layout.setAlignment(Qt.AlignCenter)
+        pas.setLayout(pas_layout)
+
+        # Setup of edit widget
+        edit_widget = QWidget()
         edit_layout = QHBoxLayout()
         edit_layout.addLayout(tool_layout)
 
-        # tool selector, expand, move
+        edit_widget.setFixedWidth(600)
+        edit_widget.setLayout(edit_layout)
 
+        # Setup of main layout
         self.main_layout = QVBoxLayout()
-        self.main_layout.addLayout(pas_layout)
+        self.main_layout.addWidget(pas, 0, Qt.AlignCenter)
         self.main_layout.addWidget(self.image_display)
-        self.main_layout.addLayout(edit_layout)
+        self.main_layout.addWidget(edit_widget,0, Qt.AlignCenter)
         self.setLayout(self.main_layout)
 
         self.ensure_game_size()

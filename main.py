@@ -1,7 +1,6 @@
 import sys
 
-from PyQt5.QtWidgets import QApplication
-
+from PyQt5.QtWidgets import QApplication, QStyleFactory
 import main_ui
 
 if __name__ == "__main__":
