@@ -1,7 +1,8 @@
-from PyQt5.QtWidgets import QMainWindow, QPushButton, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, \
-    QFileDialog, QDialog, QStyleFactory
-from PyQt5.QtCore import Qt
 from PyQt5 import QtGui
+from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QMainWindow, QPushButton, QDoubleSpinBox, QHBoxLayout, QVBoxLayout, QWidget, QLabel, \
+    QFileDialog, QDialog, QFrame
+
 import game
 from game_board_ui import GameBoardUI
 
@@ -24,6 +25,9 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(self.title)
         self.main_widget = QWidget()
         self.setCentralWidget(self.main_widget)
+        font = QtGui.QFont()
+        font.setPointSize(12)
+        self.setFont(font)
 
         # Control UI elements
         self.play_button = QPushButton("Play")
@@ -51,24 +55,35 @@ class MainWindow(QMainWindow):
         control_layout.addWidget(self.play_button)
         control_layout.addWidget(self.next_frame_button)
 
-        control.setFixedWidth(650)
+        control.setFixedWidth(600)
         control.setLayout(control_layout)
 
         # File buttons
         file_buttons = QWidget()
         file_buttons_layout = self.make_save_load_buttons()
-        file_buttons.setFixedWidth(650)
+        file_buttons.setFixedWidth(600)
         file_buttons.setLayout(file_buttons_layout)
+
+        line = QFrame()
+        line.setFrameShape(QFrame.HLine)
+        line.setFixedWidth(650)
+
+        line2 = QFrame()
+        line2.setFrameShape(QFrame.HLine)
+        line2.setFixedWidth(650)
 
         # Setup of main layout
         self.main_layout = QVBoxLayout()
         # Saving a loading buttons
         self.main_layout.addWidget(file_buttons, 0, Qt.AlignCenter)
+        self.main_layout.addWidget(line, 0, Qt.AlignCenter)
         # GAME UI
-        self.main_layout.addWidget(self.game_holder, 1, Qt.AlignCenter)
+        self.main_layout.addWidget(self.game_holder, 2, Qt.AlignCenter)
         # CONTROL UI
+        self.main_layout.addWidget(line2, 0, Qt.AlignCenter)
         self.main_layout.addWidget(control, 0, Qt.AlignCenter)
         self.main_widget.setLayout(self.main_layout)
+        self.main_layout.setSpacing(0)
 
     def next_frame(self):
         print("Next frame clicked")

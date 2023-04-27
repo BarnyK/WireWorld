@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, qRgb
 from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout, QSpinBox
 
+import extend_board_dialog
 from game import Game
 
 
@@ -31,11 +32,16 @@ def make_labeled_spinbox(label_name, slot, min_value, max_value, initial_value):
     layout.addWidget(spin)
     spin.valueChanged.connect(slot)
 
-    spin.setFixedWidth(75)
-    label.setFixedWidth(75)
-    layout.setAlignment(Qt.AlignCenter)
-    layout.setContentsMargins(5, 5, 5, 5)
+    spin.setFixedWidth(90)
+    label.setFixedWidth(90)
+    # layout.setAlignment(Qt.AlignCenter)
+    layout.setContentsMargins(5, 0, 5, 0)
     return spin, layout
+
+
+def make_help_information():
+    content = QLabel("Left click to place cell\nRight click to empty cell")
+    return content
 
 
 class GameBoardUI(QWidget):
@@ -58,16 +64,13 @@ class GameBoardUI(QWidget):
 
         # EDIT UI
         self.tool_selector, tool_layout = make_tool_selector(self.game)
+        help_information = make_help_information()
 
         # Position and size control
         self.xpos_spinbox, xpos_spinbox_layout = make_labeled_spinbox("XPOS", self.move_board_x, 0,
                                                                       self.board_width() - self.width, self.xpos)
         self.ypos_spinbox, ypos_spinbox_layout = make_labeled_spinbox("YPOS", self.move_board_y, 0,
                                                                       self.board_height() - self.height, self.ypos)
-
-        # self.board_width_spinbox, board_width_spinbox_layout = make_labeled_spinbox("Board Width", self.move_board_y, 0,
-        #                                                               self.board_height() - self.height, self.ypos)
-
         self.width_spinbox, width_spinbox_layout = make_labeled_spinbox("View Width", self.change_view_width, 15, 2000,
                                                                         self.width)
         self.height_spinbox, height_spinbox_layout = make_labeled_spinbox("View Height", self.change_view_height, 20,
@@ -93,15 +96,18 @@ class GameBoardUI(QWidget):
         edit_widget = QWidget()
         edit_layout = QHBoxLayout()
         edit_layout.addLayout(tool_layout)
+        edit_layout.addStretch()
+        edit_layout.addWidget(help_information)
 
         edit_widget.setFixedWidth(600)
         edit_widget.setLayout(edit_layout)
+        edit_widget.setContentsMargins(25, 0, 25, 0)
 
         # Setup of main layout
         self.main_layout = QVBoxLayout()
         self.main_layout.addWidget(pas, 0, Qt.AlignCenter)
         self.main_layout.addWidget(self.image_display)
-        self.main_layout.addWidget(edit_widget,0, Qt.AlignCenter)
+        self.main_layout.addWidget(edit_widget, 0, Qt.AlignCenter)
         self.setLayout(self.main_layout)
 
         self.ensure_game_size()
@@ -213,3 +219,13 @@ class GameBoardUI(QWidget):
 
     def save_game_file(self, filepath: str):
         self.game.save_board(filepath)
+
+    def open_extend_board_dialog(self):
+        dialog = extend_board_dialog.Dialog(self)
+        dialog.setModal(True)
+        dialog.valuesSubmited.connect(self.extend_board_slot)
+        dialog.exec_()
+
+    def extend_board_slot(self, x1: int, x2: int, y1: int, y2: int):
+        print(x1, x2, y1, y2)
+        # self.game.expand_board(x1, x2, y1, y2)
