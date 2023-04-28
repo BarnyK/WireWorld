@@ -1,6 +1,6 @@
 from PyQt5 import QtGui
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtWidgets import QDialog, QApplication, QFormLayout, QSpinBox, QPushButton
+from PyQt5.QtWidgets import QWidget, QDialog, QApplication, QFormLayout, QSpinBox, QPushButton, QLabel, QVBoxLayout
 
 
 class Dialog(QDialog):
@@ -41,6 +41,20 @@ class Dialog(QDialog):
             result.append(spinbox.value())
         self.valuesSubmited.emit(*result)
         self.accept()
+
+
+class ExtendBoardWidget(QWidget):
+    def __init__(self, width: int, height: int):
+        super().__init__()
+        width_label = QLabel(f"Width {width}\tHeight: {height}")
+        button = QPushButton("Extend Size")
+        layout = QVBoxLayout(self)
+        layout.addWidget(width_label)
+        layout.addWidget(button)
+        layout.setSpacing(0)
+
+    def update_label(self, width: int, height: int):
+        raise NotImplementedError
 
 
 if __name__ == "__main__":
