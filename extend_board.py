@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QWidget, QDialog, QApplication, QFormLayout, QSpinBo
 
 
 class Dialog(QDialog):
-    valuesSubmited = pyqtSignal(int, int, int, int)
+    valuesSubmitted = pyqtSignal(int, int, int, int)
 
     def __init__(self):
         super().__init__()
@@ -39,7 +39,7 @@ class Dialog(QDialog):
         result = []
         for spinbox in [self.left_spinbox, self.right_spinbox, self.top_spinbox, self.bottom_spinbox]:
             result.append(spinbox.value())
-        self.valuesSubmited.emit(*result)
+        self.valuesSubmitted.emit(*result)
         self.accept()
 
 
@@ -50,8 +50,10 @@ class ExtendBoardWidget(QWidget):
         button = QPushButton("Extend Size")
         layout = QVBoxLayout(self)
         layout.addWidget(width_label)
+
         layout.addWidget(button)
-        layout.setSpacing(0)
+        layout.setContentsMargins(5, 0, 5, 0)
+        # layout.setSpacing(0)
 
     def update_label(self, width: int, height: int):
         raise NotImplementedError
@@ -60,5 +62,5 @@ class ExtendBoardWidget(QWidget):
 if __name__ == "__main__":
     app = QApplication([])
     dialog = Dialog()
-    dialog.valuesSubmited.connect(lambda a, b, c, d: print(a, b, c, d))
+    dialog.valuesSubmitted.connect(lambda a, b, c, d: print(a, b, c, d))
     dialog.exec_()

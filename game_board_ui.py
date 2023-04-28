@@ -36,26 +36,13 @@ def make_labeled_spinbox(label_name, slot, min_value, max_value, initial_value):
     label.setFixedWidth(90)
     # layout.setAlignment(Qt.AlignCenter)
     layout.setContentsMargins(5, 0, 5, 0)
-    layout.setSpacing(0)
+    # layout.setSpacing(0)
     return spin, layout
 
 
 def make_help_information():
     content = QLabel("Left click to place cell\nRight click to empty cell")
     return content
-
-def make_extend_board_widget(width, height):
-    width_label = QLabel(f"Width {width}\tHeight: {height}")
-    button = QPushButton("Extend Size")
-
-    w = QWidget()
-    layout = QVBoxLayout(w)
-    layout.addWidget(width_label)
-    layout.addWidget(button)
-    layout.setSpacing(0)
-
-    return w
-
 
 
 class GameBoardUI(QWidget):
@@ -65,7 +52,7 @@ class GameBoardUI(QWidget):
         self.game = game
         self.xpos = 0
         self.ypos = 0
-        self.width = 30
+        self.width = 40
         self.height = 40
 
         self.color_table = [qRgb(*t) for t in self.game.color_table()]
@@ -73,7 +60,7 @@ class GameBoardUI(QWidget):
         self.image_display = QLabel()
         self.image_display.setAlignment(Qt.AlignCenter)
         self.image_display.setScaledContents(True)
-        self.image_display.setMinimumSize(600, 400)
+        self.image_display.setMinimumSize(600, 600)
         self.image_display.mousePressEvent = self.image_press_event
 
         # EDIT UI
@@ -91,7 +78,7 @@ class GameBoardUI(QWidget):
                                                                           2000,
                                                                           self.height)
 
-        self.extend_board_widget = extend_board_dialog.ExtendBoardWidget(self.board_width(), self.board_height())
+        self.extend_board_widget = extend_board.ExtendBoardWidget(self.board_width(), self.board_height())
         # Setup of position and size control widget
         pas = QWidget()
         pas_layout = QHBoxLayout()
@@ -240,7 +227,7 @@ class GameBoardUI(QWidget):
     def open_extend_board_dialog(self):
         dialog = extend_board_dialog.Dialog(self)
         dialog.setModal(True)
-        dialog.valuesSubmited.connect(self.extend_board_slot)
+        dialog.valuesSubmitted.connect(self.extend_board_slot)
         dialog.exec_()
 
     def extend_board_slot(self, x1: int, x2: int, y1: int, y2: int):
