@@ -36,6 +36,7 @@ def make_labeled_spinbox(label_name, slot, min_value, max_value, initial_value):
     label.setFixedWidth(90)
     # layout.setAlignment(Qt.AlignCenter)
     layout.setContentsMargins(5, 0, 5, 0)
+    layout.setSpacing(0)
     return spin, layout
 
 
