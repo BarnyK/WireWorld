@@ -77,6 +77,7 @@ class GameBoardUI(QWidget):
         self.pas.ypos_spinbox.valueChanged.connect(self.move_board_y)
         self.pas.view_w_spinbox.valueChanged.connect(self.change_view_width)
         self.pas.view_h_spinbox.valueChanged.connect(self.change_view_height)
+        self.pas.extend_button.clicked.connect(self.open_extend_board_dialog)
 
         # Setup of edit widget
         edit_widget = QWidget()
@@ -210,7 +211,7 @@ class GameBoardUI(QWidget):
         self.game.save_board(filepath)
 
     def open_extend_board_dialog(self):
-        dialog = extend_board.Dialog(self)
+        dialog = extend_board.Dialog()
         dialog.setModal(True)
         dialog.valuesSubmitted.connect(self.extend_board_slot)
         dialog.exec_()
