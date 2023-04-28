@@ -1,8 +1,9 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, qRgb
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout, QSpinBox, QPushButton
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout, QSpinBox
 
 import extend_board
+import position_widget
 from game import Game
 
 
@@ -68,33 +69,14 @@ class GameBoardUI(QWidget):
         help_information = make_help_information()
 
         # Position and size control
-        self.xpos_spinbox, xpos_spinbox_layout = make_labeled_spinbox("X Position", self.move_board_x, 0,
-                                                                      self.board_width() - self.width, self.xpos)
-        self.ypos_spinbox, ypos_spinbox_layout = make_labeled_spinbox("Y Position", self.move_board_y, 0,
-                                                                      self.board_height() - self.height, self.ypos)
-        self.width_spinbox, width_spinbox_layout = make_labeled_spinbox("View Width", self.change_view_width, 15, 2000,
-                                                                        self.width)
-        self.height_spinbox, height_spinbox_layout = make_labeled_spinbox("View Height", self.change_view_height, 20,
-                                                                          2000,
-                                                                          self.height)
 
-        self.extend_board_widget = extend_board.ExtendBoardWidget(self.board_width(), self.board_height())
-        # Setup of position and size control widget
-        pas = QWidget()
-        pas_layout = QHBoxLayout()
-
-        for spin in [xpos_spinbox_layout, ypos_spinbox_layout]:
-            pas_layout.addLayout(spin)
-
-        pas_layout.addStretch()
-        pas_layout.addWidget(self.extend_board_widget)
-        pas_layout.addStretch()
-        for spin in [width_spinbox_layout, height_spinbox_layout]:
-            pas_layout.addLayout(spin)
-
-        pas.setFixedWidth(600)
-        pas_layout.setAlignment(Qt.AlignCenter)
-        pas.setLayout(pas_layout)
+        self.pas = position_widget.PositionControlWidget()
+        self.pas.set_initial_values(self.xpos, self.ypos, self.width, self.height)
+        self.pas.update_board_size(self.board_width(), self.board_height())
+        self.pas.xpos_spinbox.valueChanged.connect(self.move_board_x)
+        self.pas.ypos_spinbox.valueChanged.connect(self.move_board_y)
+        self.pas.view_w_spinbox.valueChanged.connect(self.change_view_width)
+        self.pas.view_h_spinbox.valueChanged.connect(self.change_view_height)
 
         # Setup of edit widget
         edit_widget = QWidget()
@@ -109,7 +91,7 @@ class GameBoardUI(QWidget):
 
         # Setup of main layout
         self.main_layout = QVBoxLayout()
-        self.main_layout.addWidget(pas, 0, Qt.AlignCenter)
+        self.main_layout.addWidget(self.pas, 0, Qt.AlignCenter)
         self.main_layout.addWidget(self.image_display)
         self.main_layout.addWidget(edit_widget, 0, Qt.AlignCenter)
         self.setLayout(self.main_layout)
@@ -176,6 +158,7 @@ class GameBoardUI(QWidget):
         if extend_w > 0 or extend_h > 0:
             self.game.expand_board(0, extend_w, 0, extend_h)
             self.update_position_spinbox_ranges()
+        self.pas.update_board_size(self.board_width(), self.board_height())
 
     def change_view_width(self, value):
         self.width = value
@@ -211,11 +194,13 @@ class GameBoardUI(QWidget):
         self.update_board()
 
     def update_position_spinbox_ranges(self):
-        self.xpos_spinbox.setRange(0, self.board_width() - self.width)
-        self.ypos_spinbox.setRange(0, self.board_height() - self.height)
+        self.pas.xpos_spinbox.setRange(0, self.board_width() - self.width)
+        self.pas.ypos_spinbox.setRange(0, self.board_height() - self.height)
 
     def load_game_file(self, filepath: str):
         self.game.load_board(filepath)
+        self.pas.xpos_spinbox.setValue(0)
+        self.pas.ypos_spinbox.setValue(0)
         self.xpos = 0
         self.ypos = 0
         self.ensure_game_size()
@@ -225,7 +210,7 @@ class GameBoardUI(QWidget):
         self.game.save_board(filepath)
 
     def open_extend_board_dialog(self):
-        dialog = extend_board_dialog.Dialog(self)
+        dialog = extend_board.Dialog(self)
         dialog.setModal(True)
         dialog.valuesSubmitted.connect(self.extend_board_slot)
         dialog.exec_()

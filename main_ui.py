@@ -61,7 +61,7 @@ class MainWindow(QMainWindow):
         # File buttons
         file_buttons = QWidget()
         file_buttons_layout = self.make_save_load_buttons()
-        file_buttons.setFixedWidth(600)
+        file_buttons.setFixedWidth(650)
         file_buttons.setLayout(file_buttons_layout)
 
         line = QFrame()
