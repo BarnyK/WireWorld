@@ -174,11 +174,13 @@ class GameBoardUI(QWidget):
         self.update_board()
 
     def move_board_x(self, value):
+        print("Moving x")
         width = self.board_width()
         self.xpos = min(value, width - self.width)
         self.update_board()
 
     def move_board_y(self, value):
+        print("Moving y")
         height = self.board_height()
         self.ypos = min(value, height - self.height)
         self.update_board()
@@ -198,12 +200,15 @@ class GameBoardUI(QWidget):
         self.pas.xpos_spinbox.setRange(0, self.board_width() - self.width)
         self.pas.ypos_spinbox.setRange(0, self.board_height() - self.height)
 
+    def update_position(self, x, y):
+        self.pas.xpos_spinbox.setValue(x)
+        self.pas.ypos_spinbox.setValue(y)
+        self.xpos = x
+        self.ypos = y
+
     def load_game_file(self, filepath: str):
         self.game.load_board(filepath)
-        self.pas.xpos_spinbox.setValue(0)
-        self.pas.ypos_spinbox.setValue(0)
-        self.xpos = 0
-        self.ypos = 0
+        self.update_position(0, 0)
         self.ensure_game_size()
         self.update_board()
 
@@ -218,4 +223,9 @@ class GameBoardUI(QWidget):
 
     def extend_board_slot(self, x1: int, x2: int, y1: int, y2: int):
         print(x1, x2, y1, y2)
-        # self.game.expand_board(x1, x2, y1, y2)
+        self.game.expand_board(x1, x2, y1, y2)
+        print(self.xpos + x1, self.ypos+y1)
+        self.update_position_spinbox_ranges()
+        self.update_position(self.xpos+x1, self.ypos+y1)
+        self.pas.update_board_size(self.board_width(), self.board_height())
+        self.update_board()
