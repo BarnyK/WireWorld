@@ -74,6 +74,9 @@ class Game:
 
     def save_board(self, filename: str):
         pass
+    
+    def reset_board(self):
+        pass
 
 
 DEFAULT_BOARD_SIZE = (100, 100)
@@ -195,6 +198,9 @@ class WireWorld(Game):
 
     def save_board(self, filename: str):
         np.save(filename, self.board)
+
+    def reset_board(self):
+        self.board.fill(0)
 
 
 if __name__ == "__main__":

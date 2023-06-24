@@ -1,6 +1,6 @@
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QImage, QPixmap, qRgb
-from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout, QSpinBox
+from PyQt5.QtWidgets import QWidget, QLabel, QVBoxLayout, QComboBox, QHBoxLayout, QSpinBox, QPushButton, QMessageBox
 
 import extend_board
 import position_widget
@@ -43,6 +43,7 @@ def make_labeled_spinbox(label_name, slot, min_value, max_value, initial_value):
 
 def make_help_information():
     content = QLabel("Left click to place cell\nRight click to empty cell")
+    content.setAlignment(Qt.AlignCenter)
     return content
 
 
@@ -65,11 +66,12 @@ class GameBoardUI(QWidget):
         self.image_display.mousePressEvent = self.image_press_event
 
         # EDIT UI
+        self.reset_button = QPushButton("  Reset Board  ")
+        self.reset_button.clicked.connect(self.reset_board)
         self.tool_selector, tool_layout = make_tool_selector(self.game)
         help_information = make_help_information()
 
         # Position and size control
-
         self.pas = position_widget.PositionControlWidget()
         self.pas.set_initial_values(self.xpos, self.ypos, self.width, self.height)
         self.pas.update_board_size(self.board_width(), self.board_height())
@@ -85,6 +87,8 @@ class GameBoardUI(QWidget):
         edit_layout.addLayout(tool_layout)
         edit_layout.addStretch()
         edit_layout.addWidget(help_information)
+        edit_layout.addStretch()
+        edit_layout.addWidget(self.reset_button)
 
         edit_widget.setFixedWidth(600)
         edit_widget.setLayout(edit_layout)
@@ -220,6 +224,12 @@ class GameBoardUI(QWidget):
         dialog.setModal(True)
         dialog.valuesSubmitted.connect(self.extend_board_slot)
         dialog.exec_()
+
+    def reset_board(self):
+        qm = QMessageBox.question(self, "Reset", "Are You sure?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if qm == QMessageBox.Yes:
+            self.game.reset_board()
+            self.update_board()
 
     def extend_board_slot(self, x1: int, x2: int, y1: int, y2: int):
         print(x1, x2, y1, y2)
