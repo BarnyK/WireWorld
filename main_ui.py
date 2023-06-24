@@ -19,6 +19,9 @@ def make_speed_selector():
 
 
 class MainWindow(QMainWindow):
+    """
+        MainWindows holds controls, game board, and file handling UI
+    """
     def __init__(self):
         super().__init__()
         self.title = "WireWorld Simulator"
@@ -52,8 +55,8 @@ class MainWindow(QMainWindow):
         control = QWidget()
         control_layout = QHBoxLayout()
         control_layout.addLayout(self.speed_selector_layout)
-        control_layout.addWidget(self.play_button)
         control_layout.addWidget(self.next_frame_button)
+        control_layout.addWidget(self.play_button)
 
         control.setFixedWidth(600)
         control.setLayout(control_layout)
