@@ -215,6 +215,7 @@ class GameBoardUI(QWidget):
         self.update_position(0, 0)
         self.ensure_game_size()
         self.update_board()
+        self.update_position_spinbox_ranges()
 
     def save_game_file(self, filepath: str):
         self.game.save_board(filepath)
