@@ -105,7 +105,6 @@ class GameBoardUI(QWidget):
         self.update_board()
 
     def update_board(self):
-        print("update_board")
         board = self.game.get_board(self.xpos, self.ypos, self.width, self.height, pad=True)
 
         image = QImage(board.data, board.shape[1], board.shape[0], board.strides[0], QImage.Format_Indexed8)
@@ -124,20 +123,16 @@ class GameBoardUI(QWidget):
             self._play(time_delimiter)
 
     def _play(self, time_delimeter: int):
-        print("Play")
         self.state = "playing"
         self.timer = QTimer()
         self.timer.timeout.connect(self.next_frame)
         self.timer.start(time_delimeter)
 
     def _pause(self):
-        print("Pause")
         self.state = "paused"
         self.timer.stop()
 
     def image_press_event(self, event):
-        print("MousePressEvent")
-
         x = event.pos().x()
         y = event.pos().y()
 
@@ -178,13 +173,11 @@ class GameBoardUI(QWidget):
         self.update_board()
 
     def move_board_x(self, value):
-        print("Moving x")
         width = self.board_width()
         self.xpos = min(value, width - self.width)
         self.update_board()
 
     def move_board_y(self, value):
-        print("Moving y")
         height = self.board_height()
         self.ypos = min(value, height - self.height)
         self.update_board()

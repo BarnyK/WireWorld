@@ -89,11 +89,9 @@ class MainWindow(QMainWindow):
         self.main_layout.setSpacing(0)
 
     def next_frame(self):
-        print("Next frame clicked")
         self.game_holder.next_frame()
 
     def play(self):
-        print("Play button clicked")
         time_delimiter = int(1 / self.fps * 1000)
         self.game_holder.play(time_delimiter)
 
@@ -116,7 +114,6 @@ class MainWindow(QMainWindow):
 
     def fps_change(self, v: float):
         self.fps = v
-        print(f"fps changed to {v}")
 
     def load_file(self):
         dialog = QDialog()
