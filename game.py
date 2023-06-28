@@ -79,7 +79,6 @@ class Game:
         pass
 
 
-DEFAULT_BOARD_SIZE = (100, 100)
 EMPTY = 0
 ELECTRON_HEAD = 1
 ELECTRON_TAIL = 2
